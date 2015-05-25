@@ -1,0 +1,38 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:context=".MainActivity">
+
+        <Button
+            android:id="@+id/pic_thumbnail_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="take a pic and get a thumbnail back" />
+
+        <Button
+            android:id="@+id/pic_save_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="take a pic and save the image" />
+
+        <Button
+            android:id="@+id/pic_gallery_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="select a image from gallery" />
+
+        <ImageView
+            android:id="@+id/image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"/>
+
+
+    </LinearLayout>
+</ScrollView>
