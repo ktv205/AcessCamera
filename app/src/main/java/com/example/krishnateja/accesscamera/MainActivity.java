@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -13,6 +14,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.MediaController;
+import android.widget.VideoView;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +29,10 @@ public class MainActivity extends AppCompatActivity {
     private ImageView mImageView;
     static final int REQUEST_TAKE_PHOTO = 2;
     static final int REQUEST_PIC_IMAGE = 3;
+    static final int REQUEST_VIDEO_CAPTURE = 4;
     String mCurrentPhotoPath;
+    private VideoView mVideoView;
+    private final static int REQEUST_PICK_VIDEO=5;
 
 
     @Override
@@ -36,6 +42,15 @@ public class MainActivity extends AppCompatActivity {
         Button thumbnailButton = (Button) findViewById(R.id.pic_thumbnail_button);
         Button saveButton = (Button) findViewById(R.id.pic_save_button);
         Button picButton = (Button) findViewById(R.id.pic_gallery_button);
+        Button videoPickButton=(Button)findViewById(R.id.video_pick_button);
+        mVideoView = (VideoView) findViewById(R.id.videoView2);
+
+        videoPickButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pickVideoIntent();
+            }
+        });
 
         mImageView = (ImageView) findViewById(R.id.image_view);
         thumbnailButton.setOnClickListener(new View.OnClickListener() {
@@ -60,9 +75,16 @@ public class MainActivity extends AppCompatActivity {
         mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(MainActivity.this,ImageActivity.class);
-                intent.putExtra("path",(String)mImageView.getTag());
+                Intent intent = new Intent(MainActivity.this, ImageActivity.class);
+                intent.putExtra("path", (String) mImageView.getTag());
                 MainActivity.this.startActivity(intent);
+            }
+        });
+        Button recordVideo = (Button) findViewById(R.id.record_video_button);
+        recordVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dispatchTakeVideoIntent();
             }
         });
     }
@@ -119,8 +141,8 @@ public class MainActivity extends AppCompatActivity {
                 Uri uri = data.getData();
                 if (uri != null) {
                     Log.d(TAG, uri.toString());
-                }else{
-                    Log.d(TAG,"uri ins null");
+                } else {
+                    Log.d(TAG, "uri ins null");
                 }
 
                 Bitmap imageBitmap = (Bitmap) extras.get("data");
@@ -170,6 +192,33 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }
+        if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
+            Uri videoUri = data.getData();
+            Log.d(TAG, "here in video->" + videoUri.toString());
+
+
+            mVideoView.setVideoURI(videoUri);
+
+            MediaController mediaController = new
+                    MediaController(this);
+            mediaController.setAnchorView(mVideoView);
+            mVideoView.setMediaController(mediaController);
+            mVideoView.start();
+
+        }
+
+        if (requestCode == REQEUST_PICK_VIDEO && resultCode == RESULT_OK) {
+            Uri videoUri = data.getData();
+            mVideoView.setVideoURI(videoUri);
+            Log.d(TAG, "here in pick video->" + videoUri.toString());
+            MediaController mediaController = new
+                    MediaController(this);
+            mediaController.setAnchorView(mVideoView);
+            mVideoView.setMediaController(mediaController);
+            mVideoView.start();
+
+        }
+
     }
 
     public String getPath(Uri uri) {
@@ -214,6 +263,20 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "contentUri->" + contentUri);
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
+    }
+
+    private void dispatchTakeVideoIntent() {
+        Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
+        }
+    }
+
+    private void pickVideoIntent(){
+      Intent intent=new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("video/*");
+        startActivityForResult(intent,REQEUST_PICK_VIDEO);
+
     }
 
 
